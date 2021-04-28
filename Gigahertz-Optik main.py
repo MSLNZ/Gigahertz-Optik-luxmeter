@@ -45,9 +45,13 @@ with open(file,mode='a') as fp:
 while True:
     if keyboard.is_pressed('t'):
         optik.set_spectral(False)
+        z = []
         for i in range(lux_measurements):
             optik.measure()
             print(optik.get_cwvalue())
+            z.append(optik.get_cwvalue())
+        a = sum(z) / 10
+        print('Mean: {}'.format(a))
         print('done')
     if keyboard.is_pressed('r'):
         with open(file, mode='a') as fp:
