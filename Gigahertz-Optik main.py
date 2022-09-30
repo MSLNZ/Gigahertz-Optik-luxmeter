@@ -3,6 +3,7 @@ from datetime import datetime
 from msl.qt import QtWidgets, QtCore, prompt
 from Controller import Optik64
 
+version = "0.1.0"
 serial = '14195'
 dll_folder = r'C:\Users\y.tan\GigaHertz Lux Meter\S-SDK-BT256\runtime'
 optik = Optik64(dll_folder, serial)
@@ -29,11 +30,11 @@ optik.set_azmode(az_mode)
 # if optik.get_quantity(calnum) != 'E':
 #     raise ValueError('not measuring illuminance')
 
-file ='TechRentals cal.csv'
+file ='test.csv' # enter new file name for job
 
-ref_plane_count = 0
-lux_count = 0
-CCT_count = 0
+text_r = []
+text_l = []
+text_c = []
 
 print('ready')
 
@@ -42,15 +43,16 @@ with open(file,mode='a') as fp:
 
 
 def r_pressed():
-    global ref_plane_count
+    global text_r
     with open(file, mode='a') as fp:
         text = prompt.text('Enter distance (m)', title=None, font=24, value='', multi_line=False, echo=0)
         if not text:
             return
+        text_r.append(text)
         optik.set_spectral(False)
-        ref_plane_count += 1
         z = []
-        lux = [f'{text} m run {ref_plane_count:02}']
+        n = text_r.count(text)
+        lux = [f'{text} m Run{n}']
         # fp.write('\n')
         for i in range(lux_measurements):
             optik.measure()
@@ -75,16 +77,17 @@ def t_pressed():
     print('done')
 
 def l_pressed():
-    global lux_count
+    global text_l
     with open(file, mode='a') as fp:
         text = prompt.text('Enter lux value (lx)', title=None, font=24, value='', multi_line=False, echo=0)
         if not text:
             return
+        text_l.append(text)
         optik.set_spectral(False)
         #optik.set_spectral(True)
-        lux_count += 1
         z = []
-        lux = [f'{text} lux run {lux_count:02}']
+        n = text_l.count(text)
+        lux = [f'{text} lux Run{n}']
         # fp.write('\n')
         for i in range(lux_measurements):
             optik.measure()
@@ -97,15 +100,16 @@ def l_pressed():
         print('done')
 
 def c_pressed():
-    global CCT_count
+    global text_c
     with open(file, mode='a') as fp:
-        text = prompt.text('Enter lux value/distance ', title=None, font=24, value='', multi_line=False, echo=0)
+        text = prompt.text('Enter lux value/distance/shunt V ', title=None, font=24, value='', multi_line=False, echo=0)
         if not text:
             return
+        text_c.append(text)
         optik.set_spectral(True)
-        CCT_count += 1
         z = []
-        colour = [f'CCT run {CCT_count:02} at {text}']
+        n = text_c.count(text)
+        colour = [f'CCT at {text} Run{n}']
         # fp.write('\n')
         for i in range(CCT_measurements):
             optik.measure()
