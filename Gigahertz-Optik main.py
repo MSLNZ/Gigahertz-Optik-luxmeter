@@ -3,7 +3,7 @@ from datetime import datetime
 from msl.qt import QtWidgets, QtCore, prompt
 from Controller import Optik64
 
-version = "0.1.0"
+version = "0.1.1"
 serial = '14195'
 dll_folder = r'C:\Users\y.tan\GigaHertz Lux Meter\S-SDK-BT256\runtime'
 optik = Optik64(dll_folder, serial)
@@ -30,7 +30,7 @@ optik.set_azmode(az_mode)
 # if optik.get_quantity(calnum) != 'E':
 #     raise ValueError('not measuring illuminance')
 
-file ='test.csv' # enter new file name for job
+file ='K2_cal121022.csv' # enter new file name for job
 
 text_r = []
 text_l = []
@@ -39,7 +39,7 @@ text_c = []
 print('ready')
 
 with open(file,mode='a') as fp:
-    fp.write('\n' + datetime.now().replace(microsecond=0).isoformat(sep=' ')+'\n')
+    fp.write(f' \n version: {version} \n {datetime.now().replace(microsecond=0).isoformat(sep=" ")}\n')
 
 
 def r_pressed():
