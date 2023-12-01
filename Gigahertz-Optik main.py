@@ -3,9 +3,9 @@ from datetime import datetime
 from msl.qt import QtWidgets, QtCore, prompt
 from Controller import Optik64
 
-version = "0.1.1"
+version = "0.2.0"
 serial = '14195'
-dll_folder = r'C:\Users\y.tan\GigaHertz Lux Meter\S-SDK-BT256\runtime'
+dll_folder = r'C:\Users\y.tan\PycharmProjects\Gigahertz-Optik\dll'
 optik = Optik64(dll_folder, serial)
 
 lux_measurements = 10
@@ -30,7 +30,7 @@ optik.set_azmode(az_mode)
 # if optik.get_quantity(calnum) != 'E':
 #     raise ValueError('not measuring illuminance')
 
-file ='K2_cal121022.csv' # enter new file name for job
+file ='test.csv' # enter new file name for job
 
 text_r = []
 text_l = []
@@ -162,7 +162,7 @@ class BlackScreen(QtWidgets.QWidget):
             self.toggle()
 
 
-app = QtWidgets.QApplication()
+app = QtWidgets.QApplication([])
 bs = BlackScreen()
 bs.show()
 app.exec()
