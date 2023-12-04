@@ -1,11 +1,12 @@
 from datetime import datetime
-
 from msl.qt import QtWidgets, QtCore, prompt
+from pathlib import Path
 from Controller import Optik64
 
-version = "0.2.0"
+version = "0.2.1"
 serial = '14195'
-dll_folder = r'C:\Users\y.tan\PycharmProjects\Gigahertz-Optik\dll'
+project_dir = Path(__file__).parent
+dll_folder = str(project_dir / 'dll')
 optik = Optik64(dll_folder, serial)
 
 lux_measurements = 10
