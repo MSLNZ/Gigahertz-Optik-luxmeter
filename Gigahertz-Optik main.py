@@ -2,8 +2,37 @@ from datetime import datetime
 from msl.qt import QtWidgets, QtCore, prompt
 from pathlib import Path
 from Controller import Optik64
+import time
+import re
+import serial
+import serial.tools.list_ports
 
-version = "0.2.1"
+from msl.equipment import (
+    EquipmentRecord,
+    ConnectionRecord,
+    Backend,
+)
+
+# to find COM port for DVM connection
+ports = serial.tools.list_ports.comports(include_links=False)
+for port in ports:
+    p = [port.device]
+    print(port.device)
+
+if len(p) == 1:
+    port_id = p[0]
+
+record = EquipmentRecord(
+    manufacturer='HP',
+    model='34401A',
+    connection=ConnectionRecord(
+        address='COM4',    # if using the USB or RS232 port
+        backend=Backend.MSL,
+        timeout=5,
+    )
+)
+
+version = "0.3.1"
 serial = '14195'
 project_dir = Path(__file__).parent
 dll_folder = str(project_dir / 'dll')
@@ -11,6 +40,7 @@ optik = Optik64(dll_folder, serial)
 
 lux_measurements = 10
 CCT_measurements = 5
+dvm_samples = 10
 spectral_time = 0   # device calculates best spectral integration time based on signal
 max_spectral_time = 5000
 integral_time = 1000
@@ -36,6 +66,7 @@ file ='test.csv' # enter new file name for job
 text_r = []
 text_l = []
 text_c = []
+text_v = []
 
 print('ready')
 
@@ -122,6 +153,50 @@ def c_pressed():
         fp.write(','.join(colour) + '\n')
         print('done')
 
+# DVM measurements
+def v_pressed():
+    global text_v
+    with open(file, mode='a') as fp:
+        text = prompt.text('Enter detector name and lux/distance', title=None, font=24, value='', multi_line=False, echo=0)
+        if not text:
+            return
+        text_v.append(text)
+        z = []
+        n = text_v.count(text)
+        lux = [f'{text} Run{n}']
+        dvm.trigger()
+        z = dvm.fetch()
+        for i in z:
+            lux.append(str(i))
+        print(lux)
+        fp.write(','.join(lux)+'\n')
+        print('done')
+
+class HP34401A:
+    def __init__(self, record):
+        self.dvm = record.connect()
+        # self.dvm.write('SYSTem:REMote')
+        assert self.dvm.query('SYSTem:REMote;*OPC?').startswith('1')
+        self.dvm.query('*rst;*OPC?')
+        self.dvm.query('*cls;*OPC?')
+
+    def configure(self,sample=10, NPLC=10):
+        if NPLC not in (0.02, 0.2, 1, 10, 100):
+            raise ValueError('invalid NPLC')
+        self.dvm.query(f'Func "Volt:DC";Volt:DC:Range 1;NPLC {NPLC};:SAMP:Count {sample};*OPC?')
+        error = self.dvm.query('SYSTem:ERRor?')
+        if not error.startswith('+0,'):
+            raise RuntimeError(error)
+        print(self.dvm.query('VOLT:DC:NPLC?'))
+
+    def trigger(self):
+        self.dvm.write('INITIATE;*OPC?')
+
+    def fetch(self):
+        assert self.dvm.read().startswith('1')
+        samples = self.dvm.query('Fetch?')
+        return list(map(float,samples.split(',')))
+
 
 class BlackScreen(QtWidgets.QWidget):
 
@@ -161,7 +236,13 @@ class BlackScreen(QtWidgets.QWidget):
             self.toggle()
             l_pressed()
             self.toggle()
+        elif event.key() == QtCore.Qt.Key_V:
+            self.toggle()
+            v_pressed()
+            self.toggle()
 
+dvm = HP34401A(record)
+dvm.configure(sample=dvm_samples, NPLC=10)
 
 app = QtWidgets.QApplication([])
 bs = BlackScreen()
