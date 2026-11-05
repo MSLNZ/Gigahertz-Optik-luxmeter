@@ -45,3 +45,4 @@ condatests.ini
 
 # ignore all scripts in the junk/ folder
 junk/
+uv.lock
