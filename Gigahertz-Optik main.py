@@ -6,50 +6,51 @@ import time
 import re
 import serial.tools.list_ports
 
-# from msl.equipment import (
-#     Equipment,
-#     Connection,
-#     Backend,
-# )
+from msl.equipment import (
+    Equipment,
+    Connection,
+    Backend,
+)
 
-# def find_hp_dmm(command: str = "*IDN?", timeout: float = 5):
-#     # to find COM port for DVM connection
-#     ports = serial.tools.list_ports.comports(include_links=False)
-#     for port in ports:
-#         port_id = port.device
-#
-#         # if len(p) == 1:
-#         #     port_id = p[0]
-#
-#         record = Equipment(
-#             manufacturer='HP',
-#             model='34401A',
-#             connection=Connection(
-#                 address=port_id,    # if using the USB or RS232 port
-#                 backend=Backend.MSL,
-#                 timeout=timeout,
-#             )
-#         )
-#
-#         try:
-#             cxn = record.connect()
-#         except:
-#             print('could not connect')
-#             continue
-#
-#         try:
-#             identity = cxn.query(command)
-#         except:
-#             continue
-#         else:
-#             if identity.startswith("HEWLETT-PACKARD"):
-#                 print(f"Found {identity.strip()} at {port_id}")
-#                 return record
+version = "2026.11.06"
+
+def find_hp_dmm(command: str = "*IDN?", timeout: float = 5):
+    # to find COM port for DVM connection
+    ports = serial.tools.list_ports.comports(include_links=False)
+    for port in ports:
+        port_id = port.device
+
+        # if len(p) == 1:
+        #     port_id = p[0]
+
+        record = Equipment(
+            manufacturer='HP',
+            model='34401A',
+            connection=Connection(
+                address=port_id,    # if using the USB or RS232 port
+                backend=Backend.MSL,
+                timeout=timeout,
+            )
+        )
+
+        try:
+            cxn = record.connect()
+        except:
+            print('could not connect')
+            continue
+
+        try:
+            identity = cxn.query(command)
+        except:
+            continue
+        else:
+            if identity.startswith("HEWLETT-PACKARD"):
+                print(f"Found {identity.strip()} at {port_id}")
+                return record
 
 # dmm = find_hp_dmm()
 # print(dmm)
 
-version = "0.3.1"
 SN = '14195'
 project_dir = Path(__file__).parent
 dll_folder = str(project_dir / 'dll')
