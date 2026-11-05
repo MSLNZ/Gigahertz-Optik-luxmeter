@@ -11,7 +11,8 @@ class Optik64(Client64):
                           module32='Server',
                           append_sys_path=[root, dll_folder],
                           append_environ_path=[root, dll_folder],
-                          serial = serial)
+                          serial = serial
+                          )
 
     def __getattr__(self, method32):
         def send(*args, **kwargs):

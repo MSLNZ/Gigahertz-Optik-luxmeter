@@ -24,12 +24,10 @@ error_codes = {-5000: 'general communication problem',
     -5998: 'device connected with different serial number',
     -5999: 'unknown error'}
 
-
 class Optik(Server32):
     
-    def __init__(self, host, port, quiet, **kwargs):
-        Server32.__init__(self, 'GOMDBTS256.dll', 'windll', host, port, quiet)
-        
+    def __init__(self, host, port, **kwargs):
+        Server32.__init__(self, 'GOMDBTS256.dll', 'windll', host, port)
         self._handle = None
         self.name = 'BTS256_'+kwargs['serial'].rstrip('M')
         self.get_handle(self.name)
@@ -40,9 +38,11 @@ class Optik(Server32):
      
     def get_handle(self, name):
         handle = ctypes.c_int()
+        print(name.encode())
         self._check_return(self.lib.GOMDBTS256_getHandle(ctypes.c_char_p(name.encode()), ctypes.byref(handle)))
         self._handle = handle.value
-        
+        print("XXXX")
+
     def release_handle(self):
         self._check_return(self.lib.GOMDBTS256_releaseHandle(self._handle))
 

@@ -4,39 +4,56 @@ from pathlib import Path
 from Controller import Optik64
 import time
 import re
-import serial
 import serial.tools.list_ports
 
-from msl.equipment import (
-    EquipmentRecord,
-    ConnectionRecord,
-    Backend,
-)
+# from msl.equipment import (
+#     Equipment,
+#     Connection,
+#     Backend,
+# )
 
-# to find COM port for DVM connection
-ports = serial.tools.list_ports.comports(include_links=False)
-for port in ports:
-    p = [port.device]
-    print(port.device)
+# def find_hp_dmm(command: str = "*IDN?", timeout: float = 5):
+#     # to find COM port for DVM connection
+#     ports = serial.tools.list_ports.comports(include_links=False)
+#     for port in ports:
+#         port_id = port.device
+#
+#         # if len(p) == 1:
+#         #     port_id = p[0]
+#
+#         record = Equipment(
+#             manufacturer='HP',
+#             model='34401A',
+#             connection=Connection(
+#                 address=port_id,    # if using the USB or RS232 port
+#                 backend=Backend.MSL,
+#                 timeout=timeout,
+#             )
+#         )
+#
+#         try:
+#             cxn = record.connect()
+#         except:
+#             print('could not connect')
+#             continue
+#
+#         try:
+#             identity = cxn.query(command)
+#         except:
+#             continue
+#         else:
+#             if identity.startswith("HEWLETT-PACKARD"):
+#                 print(f"Found {identity.strip()} at {port_id}")
+#                 return record
 
-if len(p) == 1:
-    port_id = p[0]
-
-record = EquipmentRecord(
-    manufacturer='HP',
-    model='34401A',
-    connection=ConnectionRecord(
-        address='COM4',    # if using the USB or RS232 port
-        backend=Backend.MSL,
-        timeout=5,
-    )
-)
+# dmm = find_hp_dmm()
+# print(dmm)
 
 version = "0.3.1"
-serial = '14195'
+SN = '14195'
 project_dir = Path(__file__).parent
 dll_folder = str(project_dir / 'dll')
-optik = Optik64(dll_folder, serial)
+optik = Optik64(dll_folder, SN)
 
 lux_measurements = 10
 CCT_measurements = 5
@@ -61,7 +78,7 @@ optik.set_azmode(az_mode)
 # if optik.get_quantity(calnum) != 'E':
 #     raise ValueError('not measuring illuminance')
 
-file ='test.csv' # enter new file name for job
+file ='Airlab_cal051126.csv' # enter new file name for job
 
 text_r = []
 text_l = []
@@ -241,8 +258,8 @@ class BlackScreen(QtWidgets.QWidget):
             v_pressed()
             self.toggle()
 
-dvm = HP34401A(record)
-dvm.configure(sample=dvm_samples, NPLC=10)
+# dvm = HP34401A(dmm)
+# dvm.configure(sample=dvm_samples, NPLC=10)
 
 app = QtWidgets.QApplication([])
 bs = BlackScreen()
