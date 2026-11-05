@@ -1,0 +1,23 @@
+[project]
+name = "gigahertz-optik-luxmeter"
+version = "2026.11.06"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+]
+requires-python = ">=3.14"
+dependencies = [
+    "msl-equipment",
+    "msl-loadlib>=1.1.0",
+    "msl-qt",
+    "pyserial>=3.5",
+    "pyside6>=6.12.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.7,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+msl-qt = { git = "https://github.com/MSLNZ/msl-qt.git" }
+msl-equipment = { git = "https://github.com/MSLNZ/msl-equipment.git" }
